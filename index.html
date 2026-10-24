@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#15803d">
+
+  <title>Warung Ledger | Buku Kas Digital</title>
+
+  <!-- CSS: Desain dan tampilan aplikasi -->
+  <style>
+    :root {
+      --green: #15803d;
+      --green-light: #dcfce7;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --bg: #f3f6f4;
+      --text: #17251c;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .container {
+      width: min(100% - 28px, 760px);
+      margin: auto;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--green);
+      color: white;
+      font-weight: 900;
+      font-size: 22px;
+    }
+
+    h1, h2, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 2px;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .heading {
+      margin: 26px 0 18px;
+    }
+
+    .heading h2 {
+      margin-bottom: 6px;
+      font-size: 26px;
+    }
+
+    .heading p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 15px #0f172a08;
+    }
+
+    .balance-card {
+      background: linear-gradient(135deg, #166534, #16a34a);
+      color: white;
+      padding: 24px;
+      border-radius: 22px;
+      margin-bottom: 16px;
+    }
+
+    .balance-label {
+      color: #dcfce7;
+      font-size: 14px;
+    }
+
+    .balance-number {
+      font-size: clamp(28px, 7vw, 38px);
+      font-weight: 850;
+      margin: 12px 0;
+      overflow-wrap: anywhere;
+    }
+
+    .balance-caption {
+      color: #dcfce7;
+      font-size: 12px;
+    }
+
+    .balance-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      border-top: 1px solid #ffffff40;
+      margin-top: 20px;
+      padding-top: 17px;
+    }
+
+    .balance-stats small {
+      display: block;
+      color: #dcfce7;
+      margin-bottom: 6px;
+    }
+
+    .balance-stats strong {
+      font-size: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary .card {
+      margin: 0;
+      padding: 16px;
+      min-width: 0;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .summary-value {
+      font-size: 17px;
+      font-weight: 800;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .green {
+      color: var(--green);
+    }
+
+    .red {
+      color: var(--red);
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    .type-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .type-btn {
+      padding: 12px 8px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: white;
+      color: var(--muted);
+      font-weight: 750;
+    }
+
+    .type-btn.active-income {
+      border-color: var(--green);
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .type-btn.active-expense {
+      border-color: var(--red);
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    input {
+      width: 100%;
+      min-width: 0;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 11px;
+      background: white;
+      color: var(--text);
+    }
+
+    input:focus {
+      outline: 2px solid #86efac;
+      border-color: var(--green);
+    }
+
+    .money-input {
+      display: flex;
+      border: 1px solid #cbd5e1;
+      border-radius: 11px;
+      overflow: hidden;
+    }
+
+    .money-prefix {
+      padding: 13px;
+      background: #f8fafc;
+      border-right: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .money-input input {
+      border: none;
+      border-radius: 0;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 7px;
+    }
+
+    .primary-btn {
+      width: 100%;
+      border: none;
+      background: var(--green);
+      color: white;
+      font-weight: 800;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .primary-btn.expense-mode {
+      background: var(--red);
+    }
+
+    .primary-btn:active {
+      opacity: .85;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .delete-all {
+      padding: 9px 12px;
+      border: 1px solid #fecaca;
+      color: var(--red);
+      background: white;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .search {
+      margin-bottom: 12px;
+    }
+
+    .transaction {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .transaction:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-icon {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .transaction-icon.income {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .transaction-icon.expense {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .transaction-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .transaction-name {
+      font-size: 13px;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+      margin-bottom: 5px;
+    }
+
+    .transaction-date {
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .transaction-amount {
+      font-weight: 850;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .delete-one {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 22px;
+      padding: 5px;
+      flex-shrink: 0;
+    }
+
+    .delete-one:hover {
+      color: var(--red);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 30px 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .notice {
+      border-radius: 12px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .message {
+      font-size: 13px;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      padding: 18px 0;
+    }
+
+    @media (min-width: 560px) {
+      .summary {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .card {
+        padding: 24px;
+      }
+
+      .summary .card {
+        padding: 18px;
+      }
+
+      .transaction-amount {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="container">
+      <div class="brand">
+        <div class="logo">W</div>
+        <div>
+          <h1>Warung Ledger</h1>
+          <p class="subtitle">Buku Kas Digital Warung</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="heading">
+      <h2>Keuangan Warung</h2>
+      <p>Pantau uang masuk dan keluar dengan mudah.</p>
+    </section>
+
+    <!-- Kartu saldo utama -->
+    <section class="balance-card">
+      <div class="balance-label">Saldo Kas Warung</div>
+      <div class="balance-number" id="balance">Rp0</div>
+      <div class="balance-caption">Berdasarkan transaksi yang tercatat</div>
+
+      <div class="balance-stats">
+        <div>
+          <small>Total Pemasukan</small>
+          <strong id="balanceIncome">Rp0</strong>
+        </div>
+        <div>
+          <small>Total Pengeluaran</small>
+          <strong id="balanceExpense">Rp0</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ringkasan transaksi -->
+    <section class="summary">
+      <div class="card">
+        <div class="summary-label">Pemasukan</div>
+        <div class="summary-value green" id="summaryIncome">Rp0</div>
+      </div>
+
+      <div class="card">
+        <div class="summary-label">Pengeluaran</div>
+        <div class="summary-value red" id="summaryExpense">Rp0</div>
+      </div>
+
+      <div class="card">
+        <div class="summary-label">Jumlah Transaksi</div>
+        <div class="summary-value" id="summaryCount">0</div>
+      </div>
+    </section>
+
+    <!-- Formulir pencatatan -->
+    <section class="card">
+      <h2 class="section-title">Tambah Transaksi</h2>
+      <p class="section-desc">Catat penjualan atau pembelian barang.</p>
+
+      <div class="type-buttons">
+        <button type="button" id="incomeButton"
+                class="type-btn active-income"
+                aria-pressed="true">
+          ↑ Pemasukan
+        </button>
+
+        <button type="button" id="expenseButton"
+                class="type-btn"
+                aria-pressed="false">
+          ↓ Pengeluaran
+        </button>
+      </div>
+
+      <form id="transactionForm">
+        <div class="field">
+          <label for="description">Keterangan transaksi</label>
+          <input id="description" type="text"
+                 maxlength="120" required
+                 placeholder="Contoh: Penjualan beras">
+        </div>
+
+        <div class="field">
+          <label for="amount">Nominal transaksi</label>
+
+          <div class="money-input">
+            <span class="money-prefix">Rp</span>
+            <input id="amount" type="number"
+                   min="1" max="1000000000000"
+                   step="1" inputmode="numeric"
+                   required placeholder="15000">
+          </div>
+
+          <p class="hint">Masukkan angka tanpa titik atau koma.</p>
+        </div>
+
+        <button type="submit" id="submitButton"
+                class="primary-btn">
+          + Simpan Pemasukan
+        </button>
+
+        <p id="formMessage" class="message" role="status"></p>
+      </form>
+    </section>
+
+    <!-- Riwayat transaksi -->
+    <section class="card">
+      <div class="toolbar">
+        <div>
+          <h2 class="section-title">Riwayat Transaksi</h2>
+          <p class="section-desc" style="margin-bottom:0">
+            Semua uang masuk dan keluar.
+          </p>
+        </div>
+
+        <button type="button" class="delete-all"
+                id="clearButton">
+          Hapus Semua
+        </button>
+      </div>
+
+      <input type="search" id="searchInput"
+             class="search"
+             placeholder="Cari transaksi...">
+
+      <div id="transactionList"></div>
+      <div id="emptyState" class="empty">
+        Belum ada transaksi. Tambahkan transaksi pertamamu.
+      </div>
+
+      <p class="hint" id="visibleCount">0 transaksi</p>
+    </section>
+
+    <div class="notice">
+      <strong>Penting:</strong> Data disimpan di browser perangkat ini.
+      Jangan hapus data browser sebelum membuat cadangan.
+      Versi ini belum menyinkronkan transaksi antarperangkat.
+    </div>
+
+    <footer>
+      Warung Ledger · Buku Kas Digital
+    </footer>
+
+  </main>
+
+  <!-- JAVASCRIPT: Logika aplikasi -->
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "warungLedger_transactions_v1";
+
+    let transactions = [];
+    let selectedType = "income";
+
+    const $ = id => document.getElementById(id);
+
+    const rupiah = new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    });
+
+    function formatMoney(value) {
+      return rupiah.format(value);
+    }
+
+    /*
+     * Membaca data dari localStorage.
+     * Jika data belum ada, mulai dengan array kosong.
+     */
+    function loadTransactions() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+
+        if (!raw) return [];
+
+        const data = JSON.parse(raw);
+
+        if (!Array.isArray(data)) return [];
+
+        return data.filter(t =>
+          t &&
+          typeof t.id === "string" &&
+          ["income", "expense"].includes(t.type) &&
+          typeof t.description === "string" &&
+          Number.isSafeInteger(t.amount) &&
+          t.amount > 0 &&
+          t.amount <= 1000000000000 &&
+          typeof t.date === "string" &&
+          Number.isFinite(Date.parse(t.date))
+        );
+      } catch (error) {
+        console.error("Gagal membaca transaksi:", error);
+        alert("Data tidak dapat dibaca. Jangan hapus data browser.");
+        return [];
+      }
+    }
+
+    /*
+     * Menyimpan seluruh transaksi ke localStorage.
+     * Data dikonversi menjadi teks JSON.
+     */
+    function saveTransactions() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify(transactions)
+        );
+        return true;
+      } catch (error) {
+        console.error("Gagal menyimpan:", error);
+        showMessage("Gagal menyimpan data browser.", false);
+        return false;
+      }
+    }
+
+    /*
+     * RUMUS SALDO:
+     * saldo = total pemasukan - total pengeluaran.
+     *
+     * Saldo dihitung ulang dari seluruh transaksi agar
+     * tetap benar saat transaksi dihapus.
+     */
+    function calculateTotals() {
+      let income = 0;
+      let expense = 0;
+
+      for (const t of transactions) {
+        if (t.type === "income") {
+          income += t.amount;
+        } else {
+          expense += t.amount;
+        }
+      }
+
+      return {
+        income,
+        expense,
+        balance: income - expense,
+        count: transactions.length
+      };
+    }
+
+    function renderSummary() {
+      const totals = calculateTotals();
+
+      $("balance").textContent = formatMoney(totals.balance);
+      $("balanceIncome").textContent = formatMoney(totals.income);
+      $("balanceExpense").textContent = formatMoney(totals.expense);
+
+      $("summaryIncome").textContent = formatMoney(totals.income);
+      $("summaryExpense").textContent = formatMoney(totals.expense);
+      $("summaryCount").textContent =
+        totals.count.toLocaleString("id-ID");
+    }
+
+    function setType(type) {
+      selectedType = type;
+
+      const isIncome = type === "income";
+
+      $("incomeButton").className =
+        "type-btn" + (isIncome ? " active-income" : "");
+
+      $("expenseButton").className =
+        "type-btn" + (!isIncome ? " active-expense" : "");
+
+      $("incomeButton").setAttribute(
+        "aria-pressed", String(isIncome)
+      );
+
+      $("expenseButton").setAttribute(
+        "aria-pressed", String(!isIncome)
+      );
+
+      $("submitButton").textContent = isIncome
+        ? "+ Simpan Pemasukan"
+        : "+ Simpan Pengeluaran";
+
+      $("submitButton").classList.toggle(
+        "expense-mode", !isIncome
+      );
+    }
+
+    function showMessage(message, success = true) {
+      $("formMessage").textContent = message;
+      $("formMessage").style.color =
+        success ? "#15803d" : "#dc2626";
+    }
+
+    /*
+     * Membuat transaksi baru dan menyimpannya.
+     */
+    $("transactionForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const description = $("description").value.trim();
+      const amount = Number($("amount").value);
+
+      if (!description) {
+        showMessage("Keterangan wajib diisi.", false);
+        return;
+      }
+
+      if (
+        !Number.isSafeInteger(amount) ||
+        amount < 1 ||
+        amount > 1000000000000
+      ) {
+        showMessage("Nominal Rupiah tidak valid.", false);
+        return;
+      }
+
+      const transaction = {
+        id: crypto.randomUUID
+          ? crypto.randomUUID()
+          : Date.now().toString() +
+            Math.random().toString(16).slice(2),
+        type: selectedType,
+        description,
+        amount,
+        date: new Date().toISOString()
+      };
+
+      transactions.unshift(transaction);
+
+      if (!saveTransactions()) {
+        transactions.shift();
+        return;
+      }
+
+      renderAll();
+
+      $("transactionForm").reset();
+      showMessage("Transaksi berhasil disimpan.");
+      $("description").focus();
+    });
+
+    /*
+     * Menghapus satu transaksi berdasarkan ID.
+     */
+    function deleteTransaction(id) {
+      const transaction = transactions.find(t => t.id === id);
+
+      if (!transaction) return;
+
+      if (!confirm(
+        "Hapus transaksi " + transaction.description +
+        " sebesar " + formatMoney(transaction.amount) + "?"
+      )) {
+        return;
+      }
+
+      const previous = transactions;
+
+      transactions = transactions.filter(t => t.id !== id);
+
+      if (!saveTransactions()) {
+        transactions = previous;
+        renderAll();
+        return;
+      }
+
+      renderAll();
+    }
+
+    /*
+     * Menghapus semua transaksi setelah konfirmasi.
+     */
+    function clearAllTransactions() {
+      if (transactions.length === 0) {
+        alert("Belum ada transaksi.");
+        return;
+      }
+
+      if (!confirm(
+        "Yakin menghapus SELURUH transaksi? " +
+        "Saldo akan kembali menjadi Rp0."
+      )) {
+        return;
+      }
+
+      const previous = transactions;
+      transactions = [];
+
+      if (!saveTransactions()) {
+        transactions = previous;
+        renderAll();
+        return;
+      }
+
+      renderAll();
+      showMessage("Semua transaksi telah dihapus.");
+    }
+
+    /*
+     * Membuat elemen HTML menggunakan textContent,
+     * sehingga keterangan pengguna tidak dijalankan
+     * sebagai kode HTML.
+     */
+    function renderTransactions() {
+      const list = $("transactionList");
+      const query = $("searchInput").value.trim().toLowerCase();
+
+      list.replaceChildren();
+
+      const filtered = transactions.filter(t =>
+        t.description.toLowerCase().includes(query)
+      );
+
+      $("emptyState").style.display =
+        filtered.length ? "none" : "block";
+
+      if (!filtered.length) {
+        $("emptyState").textContent = transactions.length
+          ? "Transaksi tidak ditemukan."
+          : "Belum ada transaksi. Tambahkan transaksi pertamamu.";
+      }
+
+      for (const t of filtered) {
+        const isIncome = t.type === "income";
+
+        const row = document.createElement("div");
+        row.className = "transaction";
+
+        const icon = document.createElement("div");
+        icon.className =
+          "transaction-icon " +
+          (isIncome ? "income" : "expense");
+        icon.textContent = isIncome ? "↑" : "↓";
+
+        const info = document.createElement("div");
+        info.className = "transaction-info";
+
+        const name = document.createElement("div");
+        name.className = "transaction-name";
+        name.textContent = t.description;
+
+        const date = document.createElement("div");
+        date.className = "transaction-date";
+
+        date.textContent =
+          (isIncome ? "Pemasukan" : "Pengeluaran") +
+          " · " +
+          new Date(t.date).toLocaleString("id-ID", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+
+        info.append(name, date);
+
+        /*
+         * Warna nominal:
+         * pemasukan = hijau
+         * pengeluaran = merah
+         */
+        const amount = document.createElement("div");
+
+        amount.className =
+          "transaction-amount " +
+          (isIncome ? "green" : "red");
+
+        amount.textContent =
+          (isIncome ? "+" : "−") + formatMoney(t.amount);
+
+        const del = document.createElement("button");
+        del.className = "delete-one";
+        del.type = "button";
+        del.textContent = "×";
+        del.setAttribute("aria-label", "Hapus " + t.description);
+        del.addEventListener("click", () => deleteTransaction(t.id));
+
+        row.append(icon, info, amount, del);
+        list.appendChild(row);
+      }
+
+      $("visibleCount").textContent =
+        filtered.length.toLocaleString("id-ID") +
+        " transaksi ditampilkan";
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderTransactions();
+    }
+
+    $("incomeButton").addEventListener("click", () => {
+      setType("income");
+    });
+
+    $("expenseButton").addEventListener("click", () => {
+      setType("expense");
+    });
+
+    $("clearButton").addEventListener(
+      "click", clearAllTransactions
+    );
+
+    $("searchInput").addEventListener(
+      "input", renderTransactions
+    );
+
+    /*
+     * Saat aplikasi dibuka, baca data lama,
+     * hitung saldo, dan tampilkan riwayat.
+     */
+    transactions = loadTransactions();
+    setType("income");
+    renderAll();
+  </script>
+
+</body>
+</html>
